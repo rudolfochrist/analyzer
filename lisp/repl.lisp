@@ -80,10 +80,12 @@ This is useful if you're testing things in your LISP REPL."
    :description "Set report format to XML"
    :long "xml"))
 
-(defmacro when-option (option &body body)
+(defmacro when-option ((option &key exit) &body body)
   `(let ((option (getf options ,option)))
      (when option
-       ,@body)))
+       ,@body
+       (when ,exit
+         (quit)))))
 
 (defun main ()
   (let ((*standard-output* *stdout*))
@@ -91,17 +93,17 @@ This is useful if you're testing things in your LISP REPL."
     (handler-case
         (multiple-value-bind (options args)
             (opts:get-opts extensions:*command-line-argument-list*)
-          (when-option :help
+          (when-option (:help :exit t)
             (opts:describe
              :prefix "analyzer - static analysis of test specifications for test-driven search"
              :usage-of "analyzer"
              :args "FILE"))
-          (when-option :interactive
+          (when-option (:interactive)
             (repl))
           (let ((summary (analyzer:analyze (first args))))
-            (or (when-option :json
+            (or (when-option (:json)
                   (analyzer:report summary :json t))
-                (when-option :xml
+                (when-option (:xml)
                   (analyzer:report summary :xml t))
                 (analyzer:report summary)))) 
       (error (condition)
