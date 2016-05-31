@@ -4,6 +4,7 @@
 (defsystem #:analyzer-test
   :author "Sebastian Christ <rudolfo.christ@gmail.com>"
   :license "GNU AGPL"
+  :version "0.1.0"
   :depends-on (#:analyzer
                #:1am)
   :components ((:module "t"
