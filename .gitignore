@@ -1,0 +1,13 @@
+/.classpath
+/.project
+*.class
+/.settings
+*.abcl
+/target
+*.abcl-tmp
+.idea/
+*.iml
+.DS_Store
+/analyzer.jar
+*.bak
+/analyzer-exec/target/
