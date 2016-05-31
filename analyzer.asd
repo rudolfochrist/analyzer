@@ -1,5 +1,7 @@
 
 #-abcl (error "This code only works with ABCL!")
+(require 'abcl-contrib)
+(require 'abcl-asdf)
 
 (in-package :asdf-user)
 

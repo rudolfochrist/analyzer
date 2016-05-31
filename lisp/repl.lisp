@@ -1,3 +1,10 @@
+;;; -*- mode: Lisp; common-lisp-style: modern; slime-coding: utf-8-unix -*-
+;;;
+;;; repl.lisp
+
+(defparameter *stdout* *standard-output*)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (setf *standard-output* (make-broadcast-stream)))
 
 (require 'asdf)
 (require 'abcl-contrib)
@@ -43,8 +50,8 @@ This is useful if you're testing things in your LISP REPL."
      (print-help *commands*))
     (((q quit))
      (if interactive
-         (return-from repl)
-         (quit)))
+       (return-from repl)
+       (quit)))
     (((a analyze) path &optional format output)
      (declare (ignore format output))
      (analyzer:analyze path))
@@ -53,14 +60,55 @@ This is useful if you're testing things in your LISP REPL."
   (terpri)
   (repl interactive))
 
+(opts:define-opts
+  (:name
+   :help
+   :description "Prints this help"
+   :short #\h
+   :long "help")
+  (:name
+   :interactive
+   :description "Start an interactive REPL session"
+   :short #\i
+   :long "interactive")
+  (:name
+   :json
+   :description "Set report format to JSON"
+   :long "json")
+  (:name
+   :xml
+   :description "Set report format to XML"
+   :long "xml"))
+
+(defmacro when-option (option &body body)
+  `(let ((option (getf options ,option)))
+     (when option
+       ,@body)))
+
 (defun main ()
-  (format t "~%~%~%Analyzer v~A~%Type help or h for help.~%"
-          (analyzer:version))
-  (handler-case (repl)
-    (error (condition)
-      (format t "An error occurred:~%~%")
-      (describe condition)
-      (quit))))
+  (let ((*standard-output* *stdout*))
+    (terpri)
+    (handler-case
+        (multiple-value-bind (options args)
+            (opts:get-opts extensions:*command-line-argument-list*)
+          (when-option :help
+            (opts:describe
+             :prefix "analyzer - static analysis of test specifications for test-driven search"
+             :usage-of "analyzer"
+             :args "FILE"))
+          (when-option :interactive
+            (repl))
+          (let ((summary (analyzer:analyze (first args))))
+            (or (when-option :json
+                  (analyzer:report summary :json t))
+                (when-option :xml
+                  (analyzer:report summary :xml t))
+                (analyzer:report summary)))) 
+      (error (condition)
+        (format t "An error occurred: ~%~%")
+        (describe condition)
+        (quit))))
+  (quit))
 
 (main)
 

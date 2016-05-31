@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+: ${ABCL_JAR=/opt/abcl/abcl.jar}
+
+java -jar $ABCL_JAR --noinit --load lisp/repl.lisp -- "$@"
