@@ -94,17 +94,18 @@ This is useful if you're testing things in your LISP REPL."
         (multiple-value-bind (options args)
             (opts:get-opts extensions:*command-line-argument-list*)
           (when-option (:help :exit t)
-            (opts:describe
-             :prefix "analyzer - static analysis of test specifications for test-driven search"
-             :usage-of "analyzer"
-             :args "FILE"))
+                       (opts:describe
+                        :prefix "analyzer - static analysis of test specifications for test-driven search"
+                        :usage-of "analyzer"
+                        :args "FILE"))
           (when-option (:interactive)
-            (repl))
+                       (format t "Type h or help for list of available commands~%") 
+                       (repl))
           (let ((summary (analyzer:analyze (first args))))
             (or (when-option (:json)
-                  (analyzer:report summary :json t))
+                             (analyzer:report summary :json t))
                 (when-option (:xml)
-                  (analyzer:report summary :xml t))
+                             (analyzer:report summary :xml t))
                 (analyzer:report summary)))) 
       (error (condition)
         (format t "An error occurred: ~%~%")
