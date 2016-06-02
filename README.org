@@ -41,5 +41,9 @@ To analyze a test file, do
 6. Report the results
    : CL-USER> (analyzer:report *)
 
+* License 
+
+This code is licensed under the [[https://www.gnu.org/licenses/agpl.html][GNU Affero General Public License]]. See [[file:LICENSE][LICENSE]] for details.
+
 
 
