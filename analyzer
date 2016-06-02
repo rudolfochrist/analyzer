@@ -2,4 +2,4 @@
 
 : ${ABCL_JAR=/opt/abcl/abcl.jar}
 
-java -jar $ABCL_JAR --noinit --load lisp/repl.lisp -- "$@"
+java -jar $ABCL_JAR --noinit --noinform --load lisp/repl.lisp -- "$@"
