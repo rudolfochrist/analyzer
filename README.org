@@ -1,3 +1,45 @@
 #+title: Analyzer
 
-This will be the README in near future.
+* Installation
+** Prerequisites 
+
+- Install JDK 1.7 (or greater)
+- Install Maven
+- Download [[http://abcl.org/][ABCL]] and extract it to =/opt/abcl=. If you chose a different location please set the =ABCL_JAR=
+  environment variable accordingly.
+
+** Building & Running
+
+First run Maven to install and build all Java dependencies.
+
+: mvn clean install
+
+*** The UNIX way
+
+In the top-level project directory, run
+
+: ./analyzer -h
+
+To analyze a test file, do
+
+: ./analyzer example-tests/ArrayJoinTest.java
+
+*** The LISP way
+
+1. Start up ABCL
+   : java -jar $ABCL_JAR
+2. Install [[https://www.quicklisp.org/beta/][Quicklisp]] (Skip this step if Quicklisp is already installed)
+   : CL-USER> (require 'abcl-contrib)
+   : CL-USER> (require 'quicklisp-abcl)
+   : CL-USER> (ql:add-to-init-file)
+3. Add the project path to the registry
+   : CL-USER> (pushnew *default-pathname-defaults* asdf:*central-registry*)
+4. Load the project
+   : CL-USER> (ql:quickload :analyzer)
+5. Run the analyzer of a test file
+   : CL-USER> (analyzer:analyze (merge-pathnames #p"example-tests/ArrayJoinTest.java"))
+6. Report the results
+   : CL-USER> (analyzer:report *)
+
+
+
