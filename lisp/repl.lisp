@@ -87,6 +87,15 @@ This is useful if you're testing things in your LISP REPL."
        (when ,exit
          (quit)))))
 
+(defmacro option-case (&rest clauses)
+  `(or
+    ,@(mapcar (lambda (clause)
+                `(and ,(if (keywordp (first clause))
+                           `(getf options ,(first clause))
+                           `,(first clause))
+                      ,@(cdr clause)))
+              clauses)))
+
 (defun main ()
   (let ((*standard-output* *stdout*))
     (terpri)
@@ -102,20 +111,22 @@ This is useful if you're testing things in your LISP REPL."
                        (format t "Type h or help for list of available commands~%") 
                        (repl))
           (let ((summary (analyzer:analyze (first args))))
-            (or (when-option (:json)
-                             (analyzer:report summary :json t))
-                (when-option (:xml)
-                             (analyzer:report summary :xml t))
-                (analyzer:report summary))))
+            (option-case
+             (:json
+              (analyzer:report summary :json t))
+             (:xml
+              (analyzer:report summary :xml t))
+             (t
+              (analyzer:report summary)))))
       (analyzer:parse-error (condition)
         (format t "Cannot parse file ~A~%Error occurred on line ~D in column ~D.~%"
                 (analyzer:parse-error-file condition)
                 (analyzer:parse-error-line condition)
-                (analyzer:parse-error-column condition)))
+                (analyzer:parse-error-column condition))) 
       (error (condition)
         (format t "An error occurred: ~%~%")
-        (describe condition))))
-  (quit))
+        (describe condition)))
+    (quit)))
 
 (main)
 
