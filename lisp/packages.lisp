@@ -35,4 +35,8 @@
    #:ambiguous-import-for-type
    #:report
    #:version
-   #:parse-error))
+   #:parse-error
+   #:parse-error-file
+   #:parse-error-line
+   #:parse-error-column
+   #:parse-error-cause))

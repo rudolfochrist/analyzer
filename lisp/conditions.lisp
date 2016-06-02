@@ -7,7 +7,9 @@
                   :reader analyzer-error-raw-exception)))
 
 (define-condition parse-error (analyzer-error)
-  ((line :initarg :line
+  ((file :initarg :file
+         :accessor parse-error-file)
+   (line :initarg :line
          :accessor parse-error-line)
    (column :initarg :column
            :accessor parse-error-column)
@@ -16,13 +18,14 @@
   (:report (lambda (condition stream)
              (princ (parse-error-cause condition) stream))))
 
-(defun signal-parse-error (java-exception)
+(defun signal-parse-error (file java-exception)
   (let ((cause (#"toString" java-exception)))
     (multiple-value-bind (match registers)
         (ppcre:scan-to-strings "line (\\d+).*column (\\d+)" cause)
       (declare (ignore match))
       (when registers
         (error (make-instance 'parse-error
+                              :file file
                               :cause cause
                               :line (aref registers 0)
                               :column (aref registers 1)

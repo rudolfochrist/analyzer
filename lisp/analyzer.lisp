@@ -176,7 +176,7 @@ If not it annotates the DEPENDECY by append a '*' to it."
         summary)
     (java-exception (condition)
       ;; TODO: test if condition is a ParserExsception
-      (signal-parse-error (java-exception-cause condition)))))
+      (signal-parse-error spec (java-exception-cause condition)))))
 
 (defun report (summary &key (stream *standard-output*) json xml)
   (cond

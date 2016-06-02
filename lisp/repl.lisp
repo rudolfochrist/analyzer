@@ -106,11 +106,15 @@ This is useful if you're testing things in your LISP REPL."
                              (analyzer:report summary :json t))
                 (when-option (:xml)
                              (analyzer:report summary :xml t))
-                (analyzer:report summary)))) 
+                (analyzer:report summary))))
+      (analyzer:parse-error (condition)
+        (format t "Cannot parse file ~A~%Error occurred on line ~D in column ~D.~%"
+                (analyzer:parse-error-file condition)
+                (analyzer:parse-error-line condition)
+                (analyzer:parse-error-column condition)))
       (error (condition)
         (format t "An error occurred: ~%~%")
-        (describe condition)
-        (quit))))
+        (describe condition))))
   (quit))
 
 (main)
