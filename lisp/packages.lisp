@@ -14,9 +14,9 @@
 (defpackage #:analyzer
   (:nicknames #:css)
   (:use :cl
-        :analyzer.parser
+   :analyzer.parser
         :anaphora
-        :java
+   :java
         :jss)
   ;; Summary accessor
   (:export
@@ -34,4 +34,5 @@
    #:ambiguous-import-types
    #:ambiguous-import-for-type
    #:report
-   #:version))
+   #:version
+   #:parse-error))
