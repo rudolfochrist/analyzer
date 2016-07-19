@@ -35,13 +35,13 @@
     `(let ((,gkeyform (#"getClass" ,keyform)))
        (cond
          ,@(mapcar (lambda (case)
-                     (destructuring-bind (type form) case
+                     (destructuring-bind (type &rest forms) case
                        (if (or (eql type 'otherwise)
                                (eql type t))
                            `(t
-                             ,form)
+                             ,@forms)
                            `((superclassp ,type ,gkeyform)
-                             ,form))))
+                             ,@forms))))
                    cases)))))
 
 (defmacro trap-java-exception (form java-exception-name)
