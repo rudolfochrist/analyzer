@@ -1,7 +1,7 @@
 
 (in-package :analyzer)
 
-(defvar +analyzer-visitor+             '|analyzer.AnalyzerVisitor|)
+(defvar +analyzer-visitor+               '|analyzer.AnalyzerVisitor|)
 (defvar +node+                           '|com.github.javaparser.ast.Node|)
 (defvar +import-declaration+             '|com.github.javaparser.ast.ImportDeclaration|)
 (defvar +field-declaration+              '|com.github.javaparser.ast.body.FieldDeclaration|)
@@ -24,3 +24,4 @@
 (defvar +integer-literal-expr+           '|com.github.javaparser.ast.expr.IntegerLiteralExpr|)
 (defvar +long-literal-expr+              '|com.github.javaparser.ast.expr.LongLiteralExpr|)
 (defvar +cast-expr+                      '|com.github.javaparser.ast.expr.CastExpr|)
+(defvar +field-access-expr+              '|com.github.javaparser.ast.expr.FieldAccessExpr|)

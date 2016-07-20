@@ -78,12 +78,25 @@ Toiner t = new Toiner();
     (is (= 1 (cdr (string-assoc "Joiner" (possible-search-subjects no-substring-summary)))))))
 
 (test static-calls-ranking
+  ;; They rank as normal object creations. This used to be different.
   (let* ((test-file (merge-pathnames "example-tests/LoginTest.java"
                                      (asdf:system-source-directory :analyzer)))
          (cu (parse test-file))
          (summary (analyze cu)))
-    ;; Login ranked three times:
-    ;; twice for the static call
-    ;; once for name similarity
-    (is (= 3 (cdr (string-assoc "Login" (possible-search-subjects summary)))))
+    ;; Login ranked twice because of name similarity.
+    (is (= 2 (cdr (string-assoc "Login" (possible-search-subjects summary)))))
     (is (= 2 (cdr (string-assoc "Session" (possible-search-subjects summary)))))))
+
+
+(test resolve-correct-scopes
+  ;; resolves to the right scope for method invocations.
+  (let ((sum (analyze (merge-pathnames "example-tests/ThisTest.java"
+                                       (asdf:system-source-directory :analyzer)))))
+    (loop for type in '("BoardA" "BoardB" "BoardC" "BoardD")
+          do
+             ;; each type is ranked twice.
+             ;; 1. The field initialization with new
+             ;; 2. The usage int he method calls
+             (is (= 2 (cdr (string-assoc type (possible-search-subjects sum))))))
+    ;; BoardE is only used in a static call in should only ranked once.
+    (is (= 1 (cdr (string-assoc "BoardE" (possible-search-subjects sum)))))))

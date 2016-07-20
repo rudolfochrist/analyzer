@@ -63,3 +63,23 @@
 
 (defun accept (node visitor arg)
   (#"accept" node visitor arg))
+
+(defun scope (expr)
+  "Determines the scope of the given expression EXPR.
+
+Informally spoken, the scope of a method call is everything before the dot.
+
+    obj.someMethod();
+    ^^^
+
+If EXPR starts with a field access (this means a `this`) it gets skipped and the next `NameExpr` is returned. "
+  (labels ((recur (scope)
+             (jtypecase scope
+               (+name-expr+ scope)
+               (+field-access-expr+
+                (recur (#"getFieldExpr" scope)))
+               (+method-call-expr+
+                (recur (#"getScope" scope)))
+               (otherwise
+                (cerror "No matching case for ~S" (jclass scope))))))
+    (recur (#"getScope" expr))))

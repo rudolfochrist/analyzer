@@ -69,7 +69,7 @@
   ;; dispatching manually on type. Urgh.
   (awhen (or (find-parent-type +variable-declaration-expr+ decl)
              (find-parent-type +assign-expr+ decl))
-    (let ((scope (#"getScope" decl)))
+    (let ((scope (scope decl)))
       (jtypecase it
         (+variable-declaration-expr+
          (rank-type summary (stringify (#"getType" it))))
@@ -78,9 +78,10 @@
       (if (null scope)
           (push (format nil "No scope in ~A. Check static imports." (stringify decl))
                 (summary-messages summary))
-          ;; Static calls, or builder/factory patterns in general
-          ;; are higher ranked.
-          (rank-type summary (stringify scope) 2)))))
+          (let ((string-scope (stringify scope)))
+            (rank-type summary (or (cdr (get-local-binding summary string-scope))
+                                   (cdr (get-global-binding summary string-scope))
+                                   string-scope)))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;  VARIABLE DECLARATION  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
