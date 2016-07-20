@@ -25,9 +25,8 @@
          (+object-creation-expr+
           (rank-type summary (stringify (#"getType" scope))))
          (+method-call-expr+
-          ;; Again. Static calls (builder/factories) are higher ranked.
           (when (find-parent-type +name-expr+ scope)
-            (rank-type summary (stringify scope) 2)))
+            (rank-type summary (stringify scope))))
          (otherwise
           (push (format nil "Don't know how to rank ~A in ~A. Ignoring it"
                         (stringify scope)
