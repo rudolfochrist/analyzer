@@ -1,6 +1,7 @@
 
 (in-package :analyzer)
 
+(defvar +object+                         '|java.lang.Object|)
 (defvar +analyzer-visitor+               '|analyzer.AnalyzerVisitor|)
 (defvar +node+                           '|com.github.javaparser.ast.Node|)
 (defvar +import-declaration+             '|com.github.javaparser.ast.ImportDeclaration|)
