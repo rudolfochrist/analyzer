@@ -32,7 +32,8 @@
 (defmacro jtypecase (keyform &body cases)
   "Like TYPECASE but for Java types."
   (let ((gkeyform (gensym "keyform")))
-    `(let ((,gkeyform (#"getClass" ,keyform)))
+    `(let ((,gkeyform (when ,keyform
+                        (#"getClass" ,keyform))))
        (cond
          ,@(mapcar (lambda (case)
                      (destructuring-bind (type &rest forms) case
