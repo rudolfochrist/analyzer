@@ -100,3 +100,18 @@ Toiner t = new Toiner();
              (is (= 2 (cdr (string-assoc type (possible-search-subjects sum))))))
     ;; BoardE is only used in a static call in should only ranked once.
     (is (= 1 (cdr (string-assoc "BoardE" (possible-search-subjects sum)))))))
+
+(test ranking-on-method-calls
+  (let* ((code "
+public class Foo {
+    private Bar bar = new Bar();
+
+    @Test
+    public void test_it() {
+        bar.doStuff();
+        this.bar.doStuff();
+    }
+}")
+         (sum (analyze (parse-string code))))
+    ;; the creation an both method calls should be ranked
+    (is (= 3 (cdr (string-assoc "Bar" (possible-search-subjects sum)))))))
