@@ -200,28 +200,18 @@ If not it annotates the DEPENDECY by append a '*' to it."
              (summary-test-name summary) (summary-file-path summary))
      (format stream "Search subjects:~%")
      (loop for (type . rank) in (possible-search-subjects summary)
-        do (format stream " ~A: ~A~&" rank type))
+           do (format stream " ~A: ~A~&" rank type))
      (format stream "~%Type Dependencies:~%")
      (loop for (type . rest) in (summary-type-dependecies summary)
-        do (format stream " ~A:~{ ~A~^,~}~&" type rest))
+           do (format stream " ~A:~{ ~A~^,~}~&" type rest))
      (format stream "~%'*': Type is either ambiguous or cannot be resolved.~%")
      (format stream "~%Imports:~%~{ ~A~&~}" (summary-imports summary))
      (format stream "~%Ambiguous type imports:~%")
      (loop for (type imports) in (summary-ambiguous-imports summary)
-        do (format stream "  ~A:~&~{    ~A~&~}" type imports))
+           do (format stream "  ~A:~&~{    ~A~&~}" type imports))
      (format stream "~%Unresolved types:~%~{ ~A~&~}" (unresolved-types summary))
      (format stream "~%Identified type hierarchies:~%")
      (loop for hierarchy in (resolve-hierarchies summary)
-        unless (= 1 (length hierarchy))
-        do (format stream " ~A:~{ ~A ~^<~}~%" (first hierarchy) (rest hierarchy)))
+           unless (= 1 (length hierarchy))
+             do (format stream " ~A:~{ ~A ~^<~}~%" (first hierarchy) (rest hierarchy)))
      (format stream "~%Messages:~%~{  ~A~&~}" (summary-messages summary)))))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  DEBUG HELPERS  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defparameter *test-file* (merge-pathnames "example-tests/ArrayJoinTest.java"
-                                           (asdf:system-source-directory :analyzer)))
-(defparameter *ignored-types-file* (merge-pathnames "example-tests/IgnoreTypesTest.java"
-                                                    (asdf:system-source-directory :analyzer)))
-
-(defparameter *s* (analyze *test-file*))
