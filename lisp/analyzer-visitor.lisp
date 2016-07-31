@@ -64,24 +64,23 @@
   (when (search "assert" (#"getName" decl) :test #'string-equal)
     (dojlist (node (#"getArgs" decl))
       (visit (resolve-instance 'method-call-visitor) node summary)))
-
-  ;; FIXME: This is ugly. First checking if parent type and then
-  ;; dispatching manually on type. Urgh.
-  (awhen (or (find-parent-type +variable-declaration-expr+ decl)
-             (find-parent-type +assign-expr+ decl))
-    (let ((scope (scope decl)))
-      (jtypecase it
-        (+variable-declaration-expr+
-         (rank-type summary (stringify (#"getType" it))))
-        (+assign-expr+
-         (rank-type summary (stringify (#"getTarget" it)))))
-      (if (null scope)
-          (push (format nil "No scope in ~A. Check static imports." (stringify decl))
-                (summary-messages summary))
-          (let ((string-scope (stringify scope)))
-            (rank-type summary (or (cdr (get-local-binding summary string-scope))
-                                   (cdr (get-global-binding summary string-scope))
-                                   string-scope)))))))
+  (let ((scope (scope decl))
+        (parent (or (find-parent-type +variable-declaration-expr+ decl)
+                    (find-parent-type +assign-expr+ decl))))
+    ;; rank variable type
+    (jtypecase parent
+      (+variable-declaration-expr+
+       (rank-type summary (stringify (#"getType" parent))))
+      (+assign-expr+
+       (rank-type summary (stringify (#"getTarget" parent)))))
+    ;; rank the scope [this means the name expr before the dor (.)]
+    (if (null scope)
+        (push (format nil "No scope in ~A. Check static imports." (stringify decl))
+              (summary-messages summary))
+        (let ((string-scope (stringify scope)))
+          (rank-type summary (or (cdr (get-local-binding summary string-scope))
+                                 (cdr (get-global-binding summary string-scope))
+                                 string-scope))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;  VARIABLE DECLARATION  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
