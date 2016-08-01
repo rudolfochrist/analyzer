@@ -26,3 +26,4 @@
 (defvar +long-literal-expr+              '|com.github.javaparser.ast.expr.LongLiteralExpr|)
 (defvar +cast-expr+                      '|com.github.javaparser.ast.expr.CastExpr|)
 (defvar +field-access-expr+              '|com.github.javaparser.ast.expr.FieldAccessExpr|)
+(defvar +class-or-interface-type+        '|com.github.javaparser.ast.type.ClassOrInterfaceType|)

@@ -115,3 +115,17 @@ public class Foo {
          (sum (analyze (parse-string code))))
     ;; the creation an both method calls should be ranked
     (is (= 3 (cdr (string-assoc "Bar" (possible-search-subjects sum)))))))
+
+(test ranking-method-calls-in-assertions
+  (let* ((code "
+public class FooTest {
+    Bar bar = new Bar();
+
+    @Test
+    public void test_it() {
+        assertTrue(bar.hasQuux());
+        assertTrue(this.bar.hasQuux());
+    }
+}")
+         (sum (analyze (parse-string code))))
+    (is (= 3 (cdr (string-assoc "Bar" (possible-search-subjects sum)))))))

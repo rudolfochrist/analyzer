@@ -81,6 +81,8 @@ If EXPR starts with a field access (this means a `this`) it gets skipped and the
                   (recur (#"getFieldExpr" scope)))
                  (+method-call-expr+
                   (recur (#"getScope" scope)))
+                 (+object-creation-expr+
+                  (#"getType" scope))
                  (otherwise
-                  (cerror "No matching case for ~S" scope))))))
-    (recur (#"getScope" expr))))
+                  (error "No matching case for ~A" scope))))))
+    (recur expr)))

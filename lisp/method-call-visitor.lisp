@@ -12,7 +12,7 @@
 (defmethod visit ((visitor (eql (resolve-instance 'method-call-visitor)))
                   (decl (jclass +method-call-expr+))
                   summary)
-  (let ((scope (#"getScope" decl)))
+  (let ((scope (scope decl)))
     (cond
       ((null scope)
        (push (format nil "No scope found for ~A" (stringify decl))
@@ -22,18 +22,22 @@
          (+name-expr+
           (awhen (get-binding summary (name-of scope))
             (rank-type summary (cdr it))))
-         (+object-creation-expr+
-          (rank-type summary (stringify (#"getType" scope))))
-         (+method-call-expr+
-          (when (find-parent-type +name-expr+ scope)
-            (rank-type summary (stringify scope))))
+         (+class-or-interface-type+
+          (rank-type summary (name-of scope)))
          (otherwise
           (push (format nil "Don't know how to rank ~A in ~A. Ignoring it"
                         (stringify scope)
                         (stringify decl))
-                (summary-messages summary)))))))
-  (dojlist (node (#"getChildrenNodes" decl))
-    (accept node (resolve-instance 'method-call-visitor) summary)))
+                (summary-messages summary))))))
+    (dojlist (node (#"getChildrenNodes" decl))
+      ;; try to detect method chains like
+      ;;   tt.getUID().getSerial();
+      ;; and prevent the double ranking on tt,
+      ;; therefore are we comparing the scope 
+      (unless (and (string= (string +method-call-expr+)
+                            (jclass-of node))
+                   (equal scope (scope node)))
+        (accept node (resolve-instance 'method-call-visitor) summary)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  OBJECT CREATION  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
