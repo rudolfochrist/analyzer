@@ -151,3 +151,17 @@ public class TestTestTest {
     (loop for class in '("Foo" "Baz" "Bar" "Loo" "Noo" "Moo" "Oglo" "Mago" "Nago")
           do (is (= 1 (cdr (string-assoc class (possible-search-subjects sum))))))))
 
+(test ignored-types-ranking
+  (let* ((sum (analyze (merge-pathnames #p"example-tests/IgnoreTypesTest.java"
+                                        (asdf:system-source-directory :analyzer))))
+         (subjects (possible-search-subjects sum)))
+    (is (= 2 (cdr (string-assoc "Foo" subjects))))
+    ;; those aren't ranked
+    (is (null (string-assoc "String" subjects)))
+    (is (null (string-assoc "List" subjects)))
+    (is (null (string-assoc "ArrayList" subjects)))
+    (is (null (string-assoc "Assert" subjects)))
+
+    ;; check also if generics have been included accidentally
+    (is (null (string-assoc "List<String>" subjects)))
+    (is (null (string-assoc "ArrayList<String>" subjects)))))

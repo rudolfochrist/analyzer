@@ -68,6 +68,16 @@
                                    "java.lang.ClassNotFoundException"))
       t)))
 
+(defun junit-p (type)
+  "Test if TYPE is in org.junit or org.hamcrest."
+  (when (or (search "org.junit" type :test #'string=)
+            (search "org.hamcrest" type :test #'string=)
+            (trap-java-exception (find-java-class (format nil "org.junit.~A" type))
+                                 "java.lang.ClassNotFoundException")
+            (trap-java-exception (find-java-class (format nil "org.hamcrest.~A" type))
+                                 "java.lang.ClassNotFoundException"))
+    t))
+
 (defun find-jclass (name)
   (let ((arrayp))
     ;; check for arrays

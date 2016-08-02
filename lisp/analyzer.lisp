@@ -28,8 +28,10 @@
   ;; some types are excluded from ranking:
   ;;   1. everything in java.lang
   ;;   2. everything in java.util
+  ;;   3. everything in org.junit and org.hamcrest
   (unless (or (java-lang-p type)
-              (java-util-p type))
+              (java-util-p type)
+              (junit-p type))
     (aif (assoc type (summary-types summary) :test #'string=)
          (incf (cdr it) rank)
          (push (cons type rank) (summary-types summary)))))
