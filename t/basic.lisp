@@ -1,11 +1,17 @@
 (in-package :cl-user)
 
 (defpackage #:analyzer.test
-  (:use :cl :1am :analyzer :analyzer.parser :jss)
+  (:use :cl :5am :analyzer :analyzer.parser :jss)
   (:import-from :alexandria
                 #:switch))
 
 (in-package :analyzer.test)
+
+(def-suite basic
+  :description "Some basic tests about the analyzer.")
+
+(in-suite basic)
+
 
 (defparameter *test-file*
   (merge-pathnames "example-tests/ArrayJoinTest.java"
@@ -156,6 +162,7 @@ public class TestTestTest {
                                         (asdf:system-source-directory :analyzer))))
          (subjects (possible-search-subjects sum)))
     (is (= 2 (cdr (string-assoc "Foo" subjects))))
+
     ;; those aren't ranked
     (is (null (string-assoc "String" subjects)))
     (is (null (string-assoc "List" subjects)))

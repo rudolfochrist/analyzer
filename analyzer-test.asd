@@ -6,9 +6,9 @@
   :license "GNU AGPL"
   :version "0.1.0"
   :depends-on (#:analyzer
-               #:1am)
+               #:fiveam)
   :components ((:module "t"
                 :components ((:file "basic")
                              (:file "string-similarity"))))
   :perform (test-op (op s)
-                    (uiop:symbol-call :1am :run)))
+                    (uiop:symbol-call :5am :run!)))
