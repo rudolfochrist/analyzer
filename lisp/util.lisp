@@ -22,7 +22,7 @@
 (defun stringify (jobject)
   "String representation of the given JOBJECT."
   (unless (null jobject)
-    (#"toString" jobject)))
+   (#"toString" jobject)))
 
 (defun superclassp (class-1 class-2)
   "Checks if CLASS1 is a superclass of CLASS2"
@@ -59,6 +59,14 @@
             (trap-java-exception (find-java-class (concatenate 'string "java.lang." type))
                                  "java.lang.ClassNotFoundException"))
     t))
+
+(defun java-util-p (type)
+  "Tests if TYPE is in java.util."
+  (when-let ((captures (nth-value 1 (ppcre:scan-to-strings "([\\w.]+)(?:<.*>)?" type))))
+    (when (or (search "java.util" (aref captures 0))
+              (trap-java-exception (find-java-class (format nil "java.util.~A" (aref captures 0)))
+                                   "java.lang.ClassNotFoundException"))
+      t)))
 
 (defun find-jclass (name)
   (let ((arrayp))

@@ -25,7 +25,11 @@
 
 (defun rank-type (summary type &optional (rank 1))
   "Adds the given RANK to the type TYPE."
-  (unless (java-lang-p type)
+  ;; some types are excluded from ranking:
+  ;;   1. everything in java.lang
+  ;;   2. everything in java.util
+  (unless (or (java-lang-p type)
+              (java-util-p type))
     (aif (assoc type (summary-types summary) :test #'string=)
          (incf (cdr it) rank)
          (push (cons type rank) (summary-types summary)))))

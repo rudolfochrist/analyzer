@@ -18,6 +18,8 @@
         :anaphora
    :java
         :jss)
+  (:import-from :alexandria
+                #:when-let)
   ;; Summary accessor
   (:export
    #:get-binding
