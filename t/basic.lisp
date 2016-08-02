@@ -129,3 +129,25 @@ public class FooTest {
 }")
          (sum (analyze (parse-string code))))
     (is (= 3 (cdr (string-assoc "Bar" (possible-search-subjects sum)))))))
+
+(test obj-creation-rank-supertypes
+  (let* ((code "
+public class TestTestTest {
+    private Oglo o = new Oglo();
+    private Mago m = new Nago();
+
+    @Test
+    public void test() {
+        Foo f = new Foo();
+        Baz b = new Bar();
+
+        Loo l;
+        Noo n;
+        l = new Loo();
+        n = new Moo();
+    }
+}")
+         (sum (analyze (parse-string code))))
+    (loop for class in '("Foo" "Baz" "Bar" "Loo" "Noo" "Moo" "Oglo" "Mago" "Nago")
+          do (is (= 1 (cdr (string-assoc class (possible-search-subjects sum))))))))
+

@@ -39,10 +39,33 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  OBJECT CREATION  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defmethod visit ((visitor (eql (resolve-instance 'analyzer-visitor))) (decl (jclass +object-creation-expr+)) summary)
-  (let ((type (#"getType" decl)))
-    (awhen (or (find-parent-type +variable-declarator+ decl)
-               (find-parent-type +assign-expr+ decl))
-      (rank-type summary (stringify type)))))
+  (let ((type (stringify (#"getType" decl)))
+        (parent (or (find-parent-type +variable-declaration-expr+ decl)
+                    (find-parent-type +field-declaration+ decl)
+                    (find-parent-type +assign-expr+ decl))))
+    ;; If object creation appears with visible super type it gets
+    ;; ranked as well, e.g.:
+    ;;     Foo f = new Foo();
+    ;; ranks Foo once. But
+    ;;     Bar b = new Foo();
+    ;; ranks Foo AND Bar.
+    (jtypecase parent
+      (+variable-declaration-expr+
+       (rank-type summary type)
+       (let ((parent-type (stringify (#"getType" parent))))
+         (unless (string= type parent-type)
+           (rank-type summary parent-type))))
+      (+assign-expr+
+       (rank-type summary type)
+       (let ((var-type (cdr (get-binding summary
+                                              (stringify (#"getTarget" parent))))))
+         (unless (string= type var-type)
+           (rank-type summary var-type))))
+      (+field-declaration+
+       (rank-type summary type)
+       (let ((field-type (stringify (#"getType" parent))))
+         (unless (string= field-type type)
+           (rank-type summary field-type)))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  METHOD DECLARATION  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
