@@ -78,7 +78,12 @@ If EXPR starts with a field access (this means a `this`) it gets skipped and the
                (jtypecase scope
                  (+name-expr+ scope)
                  (+field-access-expr+
-                  (recur (#"getFieldExpr" scope)))
+                  (let ((field-scope (#"getScope" scope)))
+                    (jtypecase field-scope
+                      (+this-expr+
+                       (recur (#"getFieldExpr" scope)))
+                      (t
+                       (recur field-scope)))))
                  (+method-call-expr+
                   (recur (#"getScope" scope)))
                  (+object-creation-expr+

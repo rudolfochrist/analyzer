@@ -27,3 +27,4 @@
 (defvar +cast-expr+                      '|com.github.javaparser.ast.expr.CastExpr|)
 (defvar +field-access-expr+              '|com.github.javaparser.ast.expr.FieldAccessExpr|)
 (defvar +class-or-interface-type+        '|com.github.javaparser.ast.type.ClassOrInterfaceType|)
+(defvar +this-expr+                      '|com.github.javaparser.ast.expr.ThisExpr|)
