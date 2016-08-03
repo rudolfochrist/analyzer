@@ -101,22 +101,10 @@
                   (decl (jclass +object-creation-expr+))
                   args)
   (destructuring-bind (lexical-env current-type summary) args
-    (declare (ignore lexical-env))
+    (declare (ignore lexical-env summary))
     (let ((type (stringify (#"getType" decl)))
           (parameters (#"getArgs" decl)))
-      (break "current type: ~A~%type: ~A~%parameters: ~A" current-type type parameters)
-      ;; FIXME
-      ;; WHAT??? Why do I rank the types if the don't match? This doesn't make
-      ;; sense at all. Actually, we don't rank a type if it doesnt match.
-      (if (string= current-type type)
+      (when (string= current-type type)
           (unless (null parameters)
             (dojlist (arg parameters)
-              (accept arg visitor args)))
-          ;; this has to be removed.
-          ;; Sat current type is Bar, ant decl is
-          ;;     new Foo();
-          ;; Then Foo is not a dependency of Bar, obviously.
-          ;; So proceed without doing anything. But if decl is
-          ;;     new Bar();
-          ;; then we need to process the args of decl (if any).
-          (add-type-dependency summary current-type type)))))
+              (accept arg visitor args)))))))
