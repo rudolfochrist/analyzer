@@ -172,3 +172,20 @@ public class TestTestTest {
     ;; check also if generics have been included accidentally
     (is (null (string-assoc "List<String>" subjects)))
     (is (null (string-assoc "ArrayList<String>" subjects)))))
+
+(test java-package-predicates
+  (is (every #'identity
+             (list (java-lang-p "String")
+                   (java-lang-p "java.lang.Stringieuwe")
+                   (java-util-p "Map")
+                   (java-util-p "java.util.Set")
+                   (java-util-p "Map<String, String>")
+                   (java-util-p "java.util.Set<Number>")
+                   (junit-p "Assert")
+                   (junit-p "org.junit.Test")
+                   (junit-p "org.hamcrest.CoreMatchers")
+                   (junit-p "CoreMatchers")))))
+
+(test error-on-security-breach
+  (signals security-breach-error
+    (analyzer::rank-type (analyzer::make-summary) "ServerSocket")))

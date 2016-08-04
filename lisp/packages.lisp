@@ -41,4 +41,8 @@
    #:parse-error-file
    #:parse-error-line
    #:parse-error-column
-   #:parse-error-cause))
+   #:parse-error-cause
+   #:java-lang-p
+   #:java-util-p
+   #:junit-p
+   #:security-breach-error))

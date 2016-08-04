@@ -53,30 +53,33 @@
                         (jclass-of (java-exception-cause condition)))
          (error condition)))))
 
+(defmacro java-package-p (type &rest packages)
+  `(when (or ,@(mapcan (lambda (package)
+                         (list `(search ,package ,type :test #'string=)
+                               `(trap-java-exception
+                                 (find-java-class (format nil "~A.~A" ,package ,type))
+                                 "java.lang.ClassNotFoundException")))
+                       packages))
+     t))
+
 (defun java-lang-p (type)
   "Tests if the given type is in java.lang"
-  (when (or (search "java.lang." type :test #'string=)
-            (trap-java-exception (find-java-class (concatenate 'string "java.lang." type))
-                                 "java.lang.ClassNotFoundException"))
-    t))
+  (java-package-p type "java.lang"))
 
 (defun java-util-p (type)
-  "Tests if TYPE is in java.util."
+  "Tests TYPE if is in java.util."
   (when-let ((captures (nth-value 1 (ppcre:scan-to-strings "([\\w.]+)(?:<.*>)?" type))))
-    (when (or (search "java.util" (aref captures 0))
-              (trap-java-exception (find-java-class (format nil "java.util.~A" (aref captures 0)))
-                                   "java.lang.ClassNotFoundException"))
-      t)))
+    (java-package-p (aref captures 0) "java.util")))
 
 (defun junit-p (type)
   "Test if TYPE is in org.junit or org.hamcrest."
-  (when (or (search "org.junit" type :test #'string=)
-            (search "org.hamcrest" type :test #'string=)
-            (trap-java-exception (find-java-class (format nil "org.junit.~A" type))
-                                 "java.lang.ClassNotFoundException")
-            (trap-java-exception (find-java-class (format nil "org.hamcrest.~A" type))
-                                 "java.lang.ClassNotFoundException"))
-    t))
+  (java-package-p type "org.junit" "org.hamcrest"))
+
+(defun io-p (type)
+  "Test if TYPE is for I/O.
+
+T if TYPE is in java.io, java.nio or java.net"
+  (java-package-p type "java.io" "java.nio" "java.net"))
 
 (defun find-jclass (name)
   (let ((arrayp))

@@ -30,3 +30,13 @@
                               :line (aref registers 0)
                               :column (aref registers 1)
                               :raw-exception java-exception))))))
+
+(define-condition security-breach-error (error)
+  ((type :accessor type
+         :initarg :type))
+  (:report (lambda (condition stream)
+             (format stream "Possible security breach.~%~
+Accessing files or open network connection can be malicious. This
+error is signaled because an object of type ~A was detected."
+                     (type condition))))
+  (:documentation "Condition signaled if possible security breach detected."))
