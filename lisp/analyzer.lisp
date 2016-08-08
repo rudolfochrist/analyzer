@@ -2,8 +2,15 @@
 (in-package :analyzer)
 
 (defstruct summary
-  imports global-bindings local-bindings types messages
-  test-name ambiguous-imports type-dependecies file-path)
+  imports
+  global-bindings
+  local-bindings
+  types
+  messages
+  test-name
+  ambiguous-imports
+  type-dependecies
+  file-path)
 
 (defun add-import (summary import)
   (pushnew import (summary-imports summary) :test #'string=))
