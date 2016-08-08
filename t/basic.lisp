@@ -189,3 +189,10 @@ public class TestTestTest {
 (test error-on-security-breach
   (signals security-breach-error
     (analyzer::rank-type (analyzer::make-summary) "ServerSocket")))
+
+(test dont-rank-primitves
+  (let* ((sum (analyze (merge-pathnames #p"example-tests/PrimitivesTest.java"
+                                        (asdf:system-source-directory :analyzer))))
+         (types (possible-search-subjects sum)))
+    (loop for primitive in '("byte" "short" "int" "long" "float" "double" "char" "boolean")
+          do (is (null (string-assoc primitive types))))))

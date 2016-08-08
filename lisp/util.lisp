@@ -64,7 +64,12 @@
 
 (defun java-lang-p (type)
   "Tests if the given type is in java.lang"
-  (java-package-p type "java.lang"))
+  ;; because int and char boxing classes are named differently
+  ;; we test them additionally
+  (if (or (string= type "int")
+          (string= type "char"))
+      t
+      (java-package-p type "java.lang")))
 
 (defun java-util-p (type)
   "Tests TYPE if is in java.util."
