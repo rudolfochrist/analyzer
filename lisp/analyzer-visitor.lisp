@@ -100,8 +100,10 @@
          (rank-type summary var-type))))
     ;; rank the scope [this means the name expr before the dor (.)]
     (if (null scope)
-        (push (format nil "No scope in ~A. Check static imports." (stringify decl))
-              (summary-messages summary))
+        (let ((str-decl (stringify decl)))
+          (unless (ppcre:scan "^[A|a]ssert.*" str-decl)
+            (push (format nil "No scope in ~A. Check static imports." str-decl)
+                           (summary-messages summary))))
         (let ((string-scope (stringify scope)))
           (rank-type summary (or (cdr (get-local-binding summary string-scope))
                                  (cdr (get-global-binding summary string-scope))
