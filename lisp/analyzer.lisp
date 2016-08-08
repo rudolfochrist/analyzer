@@ -214,7 +214,7 @@ If not it annotates the DEPENDECY by append a '*' to it."
              (summary-test-name summary) (summary-file-path summary))
      (format stream "Search subjects:~%")
      (loop for (type . rank) in (possible-search-subjects summary)
-           do (format stream " ~A: ~A~&" rank type))
+           do (format stream " ~3@A: ~A~&" rank type))
      (format stream "~%Type Dependencies:~%")
      (loop for (type . rest) in (summary-type-dependecies summary)
            do (format stream " ~A:~{ ~A~^,~}~&" type rest))
