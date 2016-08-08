@@ -95,7 +95,9 @@
       (+variable-declaration-expr+
        (rank-type summary (stringify (#"getType" parent))))
       (+assign-expr+
-       (rank-type summary (stringify (#"getTarget" parent)))))
+       (let* ((target (stringify (#"getTarget" parent)))
+              (var-type (cdr (get-binding summary target))))
+         (rank-type summary var-type))))
     ;; rank the scope [this means the name expr before the dor (.)]
     (if (null scope)
         (push (format nil "No scope in ~A. Check static imports." (stringify decl))
