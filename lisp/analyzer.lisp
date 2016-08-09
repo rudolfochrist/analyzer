@@ -126,9 +126,10 @@ If not it annotates the DEPENDECY by append a '*' to it."
        (concatenate 'string dependency "*")))))
 
 (defun add-type-dependency (summary type dependency)
-  (aif (assoc type (summary-type-dependecies summary) :test #'string=)
-       (pushnew (qualify-dependecy dependency) (cdr it) :test #'string=)
-       (push (list type (qualify-dependecy dependency)) (summary-type-dependecies summary))))
+  (unless (string-empty-p type)
+    (aif (assoc type (summary-type-dependecies summary) :test #'string=)
+         (pushnew (qualify-dependecy dependency) (cdr it) :test #'string=)
+         (push (list type (qualify-dependecy dependency)) (summary-type-dependecies summary)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  TYPE HIERARCHIES  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -192,8 +193,8 @@ If not it annotates the DEPENDECY by append a '*' to it."
         (setf (summary-file-path summary) spec)
         (rank-name-similarity summary)
         (dolist (type (mapcar #'car (summary-types summary)))
-          (resolve-import type summary)
-          (collect-dependencies compilation-unit type summary))
+          (resolve-import type summary))
+        (collect-dependencies compilation-unit "" summary)
         summary)
     (java-exception (condition)
       ;; TODO: test if condition is a ParserExsception

@@ -76,35 +76,30 @@
                   (decl (jclass +name-expr+))
                   args)
   (destructuring-bind (lexical-env current-type summary) args
-    (awhen (and (or (direct-parent-type-p +object-creation-expr+ decl)
-                    (direct-parent-type-p +method-call-expr+ decl))
-                (type-in-env lexical-env (name-of decl) summary))
+    (awhen (type-in-env lexical-env (name-of decl) summary)
       (add-type-dependency summary current-type it))))
 
 (defmethod visit ((visitor (eql (resolve-instance 'dependency-identifier)))
                   (decl (jclass +method-call-expr+))
                   args)
-  ;; TODO: Return types
-  ;; Whenever a method call is used, try to look it's return type
-  ;; up. If this is not possible because you're calling a method of the
-  ;; CUT [component under test), than check if this method has been used
-  ;; previously and has been assigned to a variable for the return type.
   (destructuring-bind (lexical-env current-type summary) args
-    (let ((scope (stringify (#"getScope" decl))))
-      (when (or (search "assert" (name-of decl) :test #'string-equal)
-                (string= current-type scope)
-                (string= current-type (type-in-env lexical-env scope summary)))
-        (dojlist (arg (#"getArgs" decl))
-          (accept arg visitor args))))))
+    (declare (ignore current-type))
+    (let ((type (type-in-env lexical-env (stringify (#"getScope" decl)) summary)))
+      (dojlist (arg (#"getArgs" decl))
+        (accept arg visitor (list lexical-env
+                                  type
+                                  summary))))))
 
 (defmethod visit ((visitor (eql (resolve-instance 'dependency-identifier)))
                   (decl (jclass +object-creation-expr+))
                   args)
   (destructuring-bind (lexical-env current-type summary) args
-    (declare (ignore lexical-env summary))
-    (let ((type (stringify (#"getType" decl)))
-          (parameters (#"getArgs" decl)))
-      (when (string= current-type type)
-          (unless (null parameters)
-            (dojlist (arg parameters)
-              (accept arg visitor args)))))))
+    (declare (ignore current-type))
+    (let ((type (stringify (#"getType" decl))))
+      (dojlist (arg (#"getArgs" decl))
+        (when (and (superclassp +object-creation-expr+ (jclass-of arg))
+                   (string/= type (stringify (#"getType" arg))))
+          (add-type-dependency summary type (stringify (#"getType" arg))))
+        (accept arg visitor (list lexical-env
+                                  type
+                                  summary))))))

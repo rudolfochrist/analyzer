@@ -121,3 +121,7 @@ T if TYPE is in java.io, java.nio or java.net"
 (defun version ()
   "Returns the current version number. Format is MAJOR.MINOR.PATCH"
   (asdf:component-version (asdf:find-system :analyzer)))
+
+(declaim (inline string-empty-p))
+(defun string-empty-p (string)
+  (= 0 (length string)))

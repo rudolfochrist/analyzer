@@ -19,7 +19,8 @@
    :java
         :jss)
   (:import-from :alexandria
-                #:when-let)
+                #:when-let
+                #:when-let*)
   ;; Summary accessor
   (:export
    #:get-binding
