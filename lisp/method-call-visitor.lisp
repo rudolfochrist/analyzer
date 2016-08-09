@@ -51,6 +51,12 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  BINARY EXPRESSION  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun maybe-rank-name-expr (node summary visitor)
+  (if (superclassp +name-expr+ (#"getClass" node))
+      (let ((binding (get-binding summary (#"getName" node))))
+        (rank-type summary (cdr binding)))
+      (accept node visitor summary)))
+
 (defmethod visit ((visitor (eql (resolve-instance 'method-call-visitor)))
                   (decl (jclass +binary-expr+))
                   summary)
@@ -58,9 +64,3 @@
         (right (#"getRight" decl)))
     (maybe-rank-name-expr left summary visitor)
     (maybe-rank-name-expr right summary visitor)))
-
-(defun maybe-rank-name-expr (node summary visitor)
-  (if (superclassp +name-expr+ (#"getClass" node))
-      (let ((binding (get-binding summary (#"getName" node))))
-        (rank-type summary (cdr binding)))
-      (accept node visitor summary)))
