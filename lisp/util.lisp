@@ -14,10 +14,11 @@
 (defmacro dojlist ((var jlist) &body body)
   "Iterate a java.util.List JLIST. Each element gets bound to VAR."
   (let ((iterator (gensym)))
-    `(loop :with ,iterator := (#"iterator" ,jlist)
-        :while (#"hasNext" ,iterator)
-        :do (let ((,var (#"next" ,iterator)))
-              ,@body))))
+    `(unless (null ,jlist)
+       (loop :with ,iterator := (#"iterator" ,jlist)
+             :while (#"hasNext" ,iterator)
+             :do (let ((,var (#"next" ,iterator)))
+                   ,@body)))))
 
 (defun stringify (jobject)
   "String representation of the given JOBJECT."

@@ -65,7 +65,9 @@
        (rank-type summary type)
        (let ((field-type (stringify (#"getType" parent))))
          (unless (string= field-type type)
-           (rank-type summary field-type)))))))
+           (rank-type summary field-type))))))
+  (dojlist (arg (#"getArgs" decl))
+    (accept arg (resolve-instance 'method-call-visitor) summary)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  METHOD DECLARATION  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
