@@ -182,7 +182,7 @@ If not it annotates the DEPENDECY by append a '*' to it."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;  INTERFACE FUNCTIONS  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun analyze (spec)
+(defun analyze (spec &key (rank-name-similarity t))
   (handler-case
       (let* ((compilation-unit (typecase spec
                                  ((or string pathname)
@@ -191,7 +191,8 @@ If not it annotates the DEPENDECY by append a '*' to it."
                                   spec)))
              (summary (walk-ast compilation-unit)))
         (setf (summary-file-path summary) spec)
-        (rank-name-similarity summary)
+        (when rank-name-similarity
+          (rank-name-similarity summary))
         (dolist (type (mapcar #'car (summary-types summary)))
           (resolve-import type summary))
         (collect-dependencies compilation-unit "" summary)
