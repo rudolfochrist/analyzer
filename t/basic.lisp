@@ -7,10 +7,10 @@
 
 (in-package :analyzer.test)
 
-(def-suite basic
+(def-suite :basic
   :description "Some basic tests about the analyzer.")
 
-(in-suite basic)
+(in-suite :basic)
 
 
 (defparameter *test-file*

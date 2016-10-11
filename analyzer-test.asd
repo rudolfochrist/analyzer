@@ -11,4 +11,4 @@
                 :components ((:file "basic")
                              (:file "string-similarity"))))
   :perform (test-op (op s)
-                    (uiop:symbol-call :5am :run!)))
+                    (uiop:symbol-call :5am :run! :basic)))
