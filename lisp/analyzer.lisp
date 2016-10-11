@@ -6,6 +6,7 @@
   global-bindings
   local-bindings
   types
+  uninitialized-types
   messages
   test-name
   ambiguous-imports
@@ -148,21 +149,37 @@ If not it annotates the DEPENDECY by append a '*' to it."
   "Tries to resolve the type hierarchies for SUMMARY-TYPES and SUMMARY-TYPE-DEPENDECIES."
   (let ((map nil))
     (loop for type in (summary-types summary)
-       do (unless (assoc (first type) map :test #'string=)
-            (setf map
-                  (acons (first type)
-                         (list-superclasses (ignore-errors (find-java-class (first type))))
-                         map))))
+          do (unless (assoc (first type) map :test #'string=)
+               (setf map
+                     (acons (first type)
+                            (list-superclasses (ignore-errors (find-java-class (first type))))
+                            map))))
     ;; somehow mapcan leaks when this function is called twice sequentially.
     ;; And I don't know why. Handling this otherwise.
     ;; (loop for type-dep in (mapcan #'identity (summary-type-dependecies summary))
     ;;    do (format t "Type dep: ~S~%" type-dep))
     (loop for type-deps in (summary-type-dependecies summary)
-       do (loop for dep in type-deps
-             do (unless (assoc dep map :test #'string=)
-                  (setf map
-                        (acons dep (list-superclasses (ignore-errors (find-java-class dep))) map)))))
+          do (loop for dep in type-deps
+                   do (unless (assoc dep map :test #'string=)
+                        (setf map
+                              (acons dep (list-superclasses (ignore-errors (find-java-class dep))) map)))))
     map))
+
+
+;;; uninitialized types
+
+(defun resolve-unanizialized-types (summary)
+  "Resolve types with declared but uninitialized variables"
+  (let ((types (mapcar #'car (summary-types summary)))
+        (local-types (mapcan (lambda (elem)
+                               (mapcar #'cdr (rest elem)))
+                             (summary-local-bindings summary)))
+        (global-types (mapcar #'cdr (summary-global-bindings summary))))
+    (setf (summary-uninitialized-types summary)
+          (set-difference (union local-types global-types :test #'string=)
+                          types
+                          :test #'string=))))
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  NAME RANKING  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -191,6 +208,7 @@ If not it annotates the DEPENDECY by append a '*' to it."
                                   spec)))
              (summary (walk-ast compilation-unit)))
         (setf (summary-file-path summary) spec)
+        (resolve-unanizialized-types summary)
         (when rank-name-similarity
           (rank-name-similarity summary))
         (dolist (type (mapcar #'car (summary-types summary)))
@@ -233,6 +251,8 @@ If not it annotates the DEPENDECY by append a '*' to it."
      (loop for (type imports) in (summary-ambiguous-imports summary)
            do (format stream "  ~A:~&~{    ~A~&~}" type imports))
      (format stream "~%Unresolved types:~%~{ ~A~&~}" (unresolved-types summary))
+     (format stream "~%Types with uninitialized variables:~%~{ ~A~&~}"
+             (summary-uninitialized-types summary))
      (format stream "~%Identified type hierarchies:~%")
      (loop for hierarchy in (resolve-hierarchies summary)
            unless (= 1 (length hierarchy))
