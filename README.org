@@ -14,7 +14,7 @@ First run Maven to install and build all Java dependencies.
 
 : mvn clean install
 
-*** The UNIX way
+*** The UNIX way (not recommended because it is very slow, unfortunately)
 
 In the top-level project directory, run
 
